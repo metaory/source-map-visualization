@@ -1,70 +1,87 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="favicon.png" type="image/png" />
+    <title>Source Map Visualization</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-<head>
-  <meta charset="utf-8">
-  <title>Source Map Visualization</title>
-  <link rel="stylesheet" href="style.css">
-</head>
+  <body>
+    <div id="dragTarget"></div>
+    <div id="promptText">
+      <section>
+        <h1>Source Map Visualization</h1>
+        <blockquote>
+          This is a visualization of JavaScript/<wbr />CSS source map data, which is useful for
+          debugging problems with generated source maps. It's designed to be high-performance so it
+          doesn't fall over with huge source maps.
+        </blockquote>
 
-<body>
-  <script>
-    try {
-      document.body.dataset.theme = localStorage.getItem('theme')
-    } catch (e) {
-      document.body.dataset.theme = null
-    }
-  </script>
-  <div id="dragTarget"></div>
-  <div id="promptText">
-    <section>
-      <h1>Source Map Visualization</h1>
-      <p>This is a visualization of JavaScript/<wbr>CSS source map data, which is useful for debugging problems with
-        generated source maps. It's designed to be high-performance so it doesn't fall over with huge source maps.</p>
-      <p>Drag and drop some files here or <button id="uploadFiles">Upload files</button> to get started. You can either
-        drop a single JavaScript/<wbr>CSS file with an inline source map comment, or a JavaScript/<wbr>CSS file and a separate
-        source map file together.</p>
-      <p>Or you can <button id="loadExample">Load an example</button> to play around with the visualization.</p>
-      <div id="errorText"></div>
-      <noscript>This app requires JavaScript to work. Please enable JavaScript and reload the page.</noscript>
-    </section>
-  </div>
-  <div id="toolbar">
-    <section>
-      <h2>Original&nbsp;code</h2>
-      <div id="fileListParent"><select id="fileList"></select></div>
-    </section>
-    <section>
-      <h2>Generated&nbsp;code</h2>
-    </section>
-  </div>
-  <div id="statusBar">
-    <section>
-      <div id="originalStatus"></div>
-    </section>
-    <section>
-      <div id="generatedStatus"></div>
-      <div class="spacer"></div>
-      <label for="wrap">
-        Wrap
-        <input id="wrap" type="checkbox">
-      </label>
-    </section>
-  </div>
-  <div id="theme">
-    <svg id="theme-light" width="25" height="25" xmlns="http://www.w3.org/2000/svg">
-      <path d="M13.5 4v3m9.5 6.5h-3M13.5 23v-3M7 13.5H4M9 9L7 7m13 0l-2 2m2 11l-2-2M7 20l2-2"></path>
-      <circle cx="13.5" cy="13.5" r="4.5" stroke-width="0"></circle>
-    </svg>
-    <svg id="theme-dark" width="25" height="25" xmlns="http://www.w3.org/2000/svg">
-      <path d="M10.1 6.6a8.08 8.08 0 00.24 11.06 8.08 8.08 0 0011.06.24c-6.46.9-12.2-4.84-11.3-11.3z" stroke-width="0">
-      </path>
-    </svg>
-  </div>
-  <div id="progressBar">
-    <div class="progress"></div>
-  </div>
-  <script src="code.js"></script>
-</body>
+        <hr />
 
+        <h2>LOCAL</h2>
+        <blockquote>
+          to get started. You can either drop a single JavaScript/<wbr /> CSS file with an inline
+          source map comment, or a JavaScript/<wbr />
+          CSS file and a separate source map file together.
+          <button id="uploadFiles">UPLOAD LOCAL</button>
+        </blockquote>
+
+        <hr />
+
+        <h2>REMOTE</h2>
+        <blockquote>
+          Or load remote URL
+          <button id="loadRemote">LOAD REMOTE</button>
+          <input type="text" id="remoteUrl" placeholder="https://example.com/example.js" />
+        </blockquote>
+        <hr />
+
+        <h2>EXAMPLE</h2>
+        <blockquote>
+          Or load an example to play around with the visualization.
+          <button id="loadExample">LOAD EXAMPLE</button>
+        </blockquote>
+
+        <div id="errorText"></div>
+        <noscript>
+          This app requires JavaScript to work. Please enable JavaScript and reload the page.
+        </noscript>
+      </section>
+    </div>
+    <div id="theme">
+      <svg
+        id="theme-toggle"
+        xmlns="http://www.w3.org/2000/svg"
+        width="48"
+        height="48"
+        viewBox="0 0 48 48"
+      >
+        <title>Toggle theme</title>
+        <g
+          fill="none"
+          stroke="#ff779966"
+          stroke-linejoin="round"
+          stroke-linecap="round"
+          stroke-width="4"
+        >
+          <path
+            stroke-linecap="round"
+            d="M24 4C12.9543 4 4 12.9543 4 24C4 35.0457 12.9543 44 24 44V4Z"
+            clip-rule="evenodd"
+          />
+          <path
+            fill="#EEBBFF88"
+            d="M24 4C35.0457 4 44 12.9543 44 24C44 35.0457 35.0457 44 24 44V4Z"
+          />
+          <path stroke-linecap="round" d="M24 36H9" />
+          <path stroke-linecap="round" d="M24 28H5" />
+          <path stroke-linecap="round" d="M24 20H5" />
+          <path stroke-linecap="round" d="M24 12H9" />
+        </g>
+      </svg>
+    </div>
+    <script type="module" src="/code.js"></script>
+  </body>
 </html>
