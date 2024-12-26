@@ -132,7 +132,7 @@ hr {
   bottom: 0;
   z-index: 1;
   overflow-y: auto;
-  padding: 100px 20px;
+  padding: 2em 1em;
   color: var(--light);
   background: linear-gradient(70deg, #aa44bb, #cc4488, #ff5577, #ff7799);
   background-size: 400% 400%;
@@ -272,4 +272,16 @@ button {
 input#remoteUrl {
   width: 96%;
   filter: saturate(1.2);
+}
+
+a {
+  text-decoration: none;
+  font-style: italic;
+}
+
+pre {
+  word-break: break-all;
+  text-wrap: auto;
+  color: #ee8844;
+  width: 30%;
 }

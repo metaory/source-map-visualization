@@ -1,4 +1,39 @@
-////////////////////////////////////////////////////////////////////////////////
+/***********************************************
+ ** Copyright (C) Evan Wallace <@evanw>        **
+ **                                            **
+ ** github.com/evanw/source-map-visualization  **
+ ***********************************************/
+
+/* $$\   $$\ $$$$$$\ $$$$$$$$\ $$$$$$\ $$$$$$$\ $$$$$$$\
+   $$ |  $$ $$  __$$\\____$$  $$  __$$\$$  __$$\$$  __$$\
+   $$ |  $$ $$ /  $$ |   $$  /$$ /  $$ $$ |  $$ $$ |  $$ |
+   $$$$$$$$ $$$$$$$$ |  $$  / $$$$$$$$ $$$$$$$  $$ |  $$ |
+   $$  __$$ $$  __$$ | $$  /  $$  __$$ $$  __$$<$$ |  $$ |
+   $$ |  $$ $$ |  $$ |$$  /   $$ |  $$ $$ |  $$ $$ |  $$ |
+   $$ |  $$ $$ |  $$ $$$$$$$$\$$ |  $$ $$ |  $$ $$$$$$$  |
+   \__|  \__\__|  \__\________\__|  \__\__|  \__\_______/
+
+
+      $$$$$$\ $$\   $$\$$$$$$$$\ $$$$$$\ $$$$$$$\
+     $$  __$$\$$ |  $$ $$  _____$$  __$$\$$  __$$\
+     $$ /  $$ $$ |  $$ $$ |     $$ /  $$ $$ |  $$ |
+     $$$$$$$$ $$$$$$$$ $$$$$\   $$$$$$$$ $$ |  $$ |
+     $$  __$$ $$  __$$ $$  __|  $$  __$$ $$ |  $$ |
+     $$ |  $$ $$ |  $$ $$ |     $$ |  $$ $$ |  $$ |
+     $$ |  $$ $$ |  $$ $$$$$$$$\$$ |  $$ $$$$$$$  |
+     \__|  \__\__|  \__\________\__|  \__\_______/
+
+       ---- ☢CONTINUE AT YOUR OWN RISK ☢----
+              -------------------------
+
+
+
+HISTORICAL CONTEXT:
+https://github.com/metaory/source-map-visualization/blob/f3e9dfec20e7bfd9625d03dd0d427affa74a9c43/code.js
+https://github.com/evanw/source-map-visualization/compare/gh-pages...metaory:source-map-visualization:gh-pages
+https://github.com/evanw/source-map-visualization/compare/gh-pages...metaory:source-map-visualization:gh-pages#diff-b513959b106b2abec77a76ef5740ce223aeb8d239bfc6f7c7aa850f0390b176e  */
+
+/* ##################################################### */
 
 const [
   loadRemoteBtn,
@@ -6,12 +41,9 @@ const [
   dragTarget,
   uploadFiles,
   loadExample,
+  loadExampleURL,
   promptText,
   errorText,
-  // toolbar,
-  // statusBar,
-  // progressBarOverlay,
-  // progressBar,
   originalStatus,
   generatedStatus,
 ] = [
@@ -20,12 +52,9 @@ const [
   '#dragTarget',
   '#uploadFiles',
   '#loadExample',
+  '#loadExampleURL',
   '#promptText',
   '#errorText',
-  // '#toolbar',
-  // '#statusBar',
-  // '#progressBar',
-  // '#progressBar .progress',
   '#originalStatus',
   '#generatedStatus',
 ].map(document.querySelector.bind(document))
@@ -36,6 +65,9 @@ let filesInput
 const isFilesDragEvent = e =>
   e.dataTransfer?.types && Array.prototype.indexOf.call(e.dataTransfer.types, 'Files') !== -1
 
+loadExampleURL.onclick = () => {
+  window.location.search = 'url=https://github.githubassets.com/assets/settings-fe0ee97d5327.js.map'
+}
 ////////////////////////////////////////////////////////////////////////////////
 
 document.ondragover = e => e.preventDefault()
@@ -64,6 +96,7 @@ uploadFiles.onclick = () => {
   if (filesInput) document.body.removeChild(filesInput)
   filesInput = document.createElement('input')
   filesInput.type = 'file'
+  filesInput.accept = '.map'
   filesInput.multiple = true
   filesInput.style.display = 'none'
   document.body.appendChild(filesInput)
@@ -134,7 +167,9 @@ async function finishEmbeddedSourceMap(code, file) {
   }
 
   const showFetchError = (e, match = []) =>
-    showLoadingError(`Failed to parse the URL in the "/${match[1]}# sourceMappingURL=" comment: ${e?.message || e}`)
+    showLoadingError(
+      `Failed to parse the URL in the "/${match[1]}# sourceMappingURL=" comment: ${e?.message || e}`,
+    )
 
   const fetchUrlMap = url =>
     fetch(new URL(url))
@@ -187,7 +222,9 @@ async function startLoading(files) {
         return finishLoading(code, map)
       }
 
-      return showLoadingError('The source map file must end in either ".map" or ".json" to be detected.')
+      return showLoadingError(
+        'The source map file must end in either ".map" or ".json" to be detected.',
+      )
     }
   }
 
@@ -214,7 +251,9 @@ for (let i = 0; i < vlqChars.length; i++) vlqTable[vlqChars.charCodeAt(i)] = i
 
 function decodeError(text, i) {
   const error = `Invalid VLQ data at index ${i}: ${text}`
-  showLoadingError(`The "mappings" field of the imported source map contains invalid data. ${error}.`)
+  showLoadingError(
+    `The "mappings" field of the imported source map contains invalid data. ${error}.`,
+  )
   throw new Error(error)
 }
 
@@ -227,9 +266,11 @@ function decodeVLQ(mappings, i) {
     // Read a byte
     if (inner >= mappings.length) decodeError('Unexpected early end of mapping data', inner)
     const c = mappings.charCodeAt(inner)
-    if ((c & 0x7f) !== c) decodeError(`Invalid mapping character: ${JSON.stringify(String.fromCharCode(c))}`, inner)
+    if ((c & 0x7f) !== c)
+      decodeError(`Invalid mapping character: ${JSON.stringify(String.fromCharCode(c))}`, inner)
     const index = vlqTable[c & 0x7f]
-    if (index === 0xff) decodeError(`Invalid mapping character: ${JSON.stringify(String.fromCharCode(c))}`, inner)
+    if (index === 0xff)
+      decodeError(`Invalid mapping character: ${JSON.stringify(String.fromCharCode(c))}`, inner)
     inner++
 
     // Decode the byte
@@ -327,7 +368,10 @@ function decodeMappings(mappings, sourcesCount, namesCount) {
         i = ii2
         originalSource += originalSourceDelta
         if (originalSource < 0 || originalSource >= sourcesCount)
-          decodeError(`Original source index ${originalSource} is invalid (there are ${sourcesCount} sources)`, i)
+          decodeError(
+            `Original source index ${originalSource} is invalid (there are ${sourcesCount} sources)`,
+            i,
+          )
 
         // Read the original line
         const [originalLineDelta, ii3] = decodeVLQ(mappings, i)
@@ -354,7 +398,10 @@ function decodeMappings(mappings, sourcesCount, namesCount) {
             i = ii5
             originalName += originalNameDelta
             if (originalName < 0 || originalName >= namesCount)
-              decodeError(`Original name index ${originalName} is invalid (there are ${namesCount} names)`, i)
+              decodeError(
+                `Original name index ${originalName} is invalid (there are ${namesCount} names)`,
+                i,
+              )
 
             // Handle the next character
             if (i < n) {
@@ -362,7 +409,10 @@ function decodeMappings(mappings, sourcesCount, namesCount) {
               if (c === 44 /* , */) {
                 i++
               } else if (c !== 59 /* ; */) {
-                decodeError(`Invalid character after mapping: ${JSON.stringify(String.fromCharCode(c))}`, i)
+                decodeError(
+                  `Invalid character after mapping: ${JSON.stringify(String.fromCharCode(c))}`,
+                  i,
+                )
               }
 
               /* XXX: WHAT IS THIS NIGHTMARE */
@@ -521,7 +571,9 @@ const validateSourceMapSources = (map, sectionIndex = null) => {
 const validateSourceMapMappings = (map, sectionIndex = null) => {
   if (typeof map.mappings !== 'string') {
     const context = sectionIndex !== null ? ` for section ${sectionIndex}` : ''
-    showLoadingError(`The imported source map is invalid. Expected the "mappings" field${context} to be a string.`)
+    showLoadingError(
+      `The imported source map is invalid. Expected the "mappings" field${context} to be a string.`,
+    )
     throw new Error('Invalid source map')
   }
 }
@@ -559,7 +611,9 @@ const parseSourceMap = sourceMapJson => {
         }
 
         if (!map) {
-          showLoadingError(`The imported source map is unsupported. Section ${i} does not contain a "map" field.`)
+          showLoadingError(
+            `The imported source map is unsupported. Section ${i} does not contain a "map" field.`,
+          )
           throw new Error('Invalid source map')
         }
 
@@ -615,13 +669,20 @@ const parseSourceMap = sourceMapJson => {
       }
     }
 
-    if (!Array.isArray(parsedJson?.sources) || parsedJson?.sources?.some(x => typeof x !== 'string')) {
-      showLoadingError('The imported source map is invalid. Expected the "sources" field to be an array of strings.')
+    if (
+      !Array.isArray(parsedJson?.sources) ||
+      parsedJson?.sources?.some(x => typeof x !== 'string')
+    ) {
+      showLoadingError(
+        'The imported source map is invalid. Expected the "sources" field to be an array of strings.',
+      )
       throw new Error('Invalid source map')
     }
 
     if (typeof parsedJson?.mappings !== 'string') {
-      showLoadingError('The imported source map is invalid. Expected the "mappings" field to be a string.')
+      showLoadingError(
+        'The imported source map is invalid. Expected the "mappings" field to be a string.',
+      )
       throw new Error('Invalid source map')
     }
 
@@ -678,7 +739,8 @@ async function finishLoading(code, map) {
   const progress = chars => {
     charsSoFar += chars
     if (!isProgressVisible && progressCalls++ > 2 && charsSoFar) {
-      const estimatedTimeLeftMS = ((Date.now() - progressStart) / charsSoFar) * (totalChars - charsSoFar)
+      const estimatedTimeLeftMS =
+        ((Date.now() - progressStart) / charsSoFar) * (totalChars - charsSoFar)
       if (estimatedTimeLeftMS > 250) {
         // progressBarOverlay.style.display = 'block'
         isProgressVisible = true
@@ -984,7 +1046,8 @@ async function splitTextIntoLinesAndRuns(text, progress) {
 
           const key = raw.slice(startIndex, i)
           const charw = unicodeWidthCache.get(key)
-          const width = charw === 0 ? Math.round(c.measureText(key).width / spaceWidth) : (charw ?? 1)
+          const width =
+            charw === 0 ? Math.round(c.measureText(key).width / spaceWidth) : (charw ?? 1)
           unicodeWidthCache.set(key, width)
           column += width
           break
@@ -1066,7 +1129,8 @@ async function createTextArea({
   const runStartColumn = index => runData[index + 3]
   const runEndColumn = index => runData[index + 4]
 
-  let { lines, longestColumnForLine, longestLineInColumns, runData } = await splitTextIntoLinesAndRuns(text, progress)
+  let { lines, longestColumnForLine, longestLineInColumns, runData } =
+    await splitTextIntoLinesAndRuns(text, progress)
   let animate = null
   let lastLineIndex = lines.length - 1
   let scrollX = 0
@@ -1143,7 +1207,9 @@ async function createTextArea({
     let maxScrollY
 
     maxScrollX = 0
-    maxScrollY = (wrappedRowsForColumns(computeColumnsAcross(width, columnWidth))[lastLineIndex + 1] - 1) * rowHeight
+    maxScrollY =
+      (wrappedRowsForColumns(computeColumnsAcross(width, columnWidth))[lastLineIndex + 1] - 1) *
+      rowHeight
 
     scrollX = Math.max(0, Math.min(scrollX, maxScrollX))
     scrollY = Math.max(0, Math.min(scrollY, maxScrollY))
@@ -1220,7 +1286,8 @@ async function createTextArea({
       if (runIsSingleChunk(run) && column <= runEndColumn(run)) {
         // A special case for single-character blocks such as tabs and emoji
         if (
-          (tabStopBehavior === 'round' && fractionalColumn >= (runStartColumn(run) + runEndColumn(run)) / 2) ||
+          (tabStopBehavior === 'round' &&
+            fractionalColumn >= (runStartColumn(run) + runEndColumn(run)) / 2) ||
           (tabStopBehavior === 'floor' && fractionalColumn >= runEndColumn(run))
         ) {
           const newIndex = runEndIndex(run)
@@ -1268,7 +1335,10 @@ async function createTextArea({
       const step = ((mappingCount / 6) >> 1) * 6
       const it = firstMapping + step
       const mappingLine = mappings[it + mappingsOffset]
-      if (mappingLine < line || (mappingLine === line && mappings[it + mappingsOffset + 1] < index)) {
+      if (
+        mappingLine < line ||
+        (mappingLine === line && mappings[it + mappingsOffset + 1] < index)
+      ) {
         firstMapping = it + 6
         mappingCount -= step + 6
       } else {
@@ -1302,9 +1372,13 @@ async function createTextArea({
       let index = column
       if (runCount > 0) {
         while (runStartColumn(runBase + 5 * nearbyRun) > column && nearbyRun > 0) nearbyRun--
-        while (runEndColumn(runBase + 5 * nearbyRun) < column && nearbyRun + 1 < runCount) nearbyRun++
+        while (runEndColumn(runBase + 5 * nearbyRun) < column && nearbyRun + 1 < runCount)
+          nearbyRun++
         const run = runBase + 5 * nearbyRun
-        index = column === runEndColumn(run) ? runEndIndex(run) : runStartIndex(run) + column - runStartColumn(run)
+        index =
+          column === runEndColumn(run)
+            ? runEndIndex(run)
+            : runStartIndex(run) + column - runStartColumn(run)
       }
       return index
     }
@@ -1316,7 +1390,10 @@ async function createTextArea({
         while (runStartIndex(runBase + 5 * nearbyRun) > index && nearbyRun > 0) nearbyRun--
         while (runEndIndex(runBase + 5 * nearbyRun) < index && nearbyRun + 1 < runCount) nearbyRun++
         const run = runBase + 5 * nearbyRun
-        column = index === runEndIndex(run) ? runEndColumn(run) : runStartColumn(run) + index - runStartIndex(run)
+        column =
+          index === runEndIndex(run)
+            ? runEndColumn(run)
+            : runStartColumn(run) + index - runStartIndex(run)
       }
       return column
     }
@@ -1411,7 +1488,9 @@ async function createTextArea({
   function boxForRange(dx, dy, columnWidth, { startColumn, endColumn }) {
     const x1 = Math.round(dx + startColumn * columnWidth + 1)
     const x2 = Math.round(
-      dx + (startColumn === endColumn ? startColumn * columnWidth + 4 : endColumn * columnWidth) - 1,
+      dx +
+        (startColumn === endColumn ? startColumn * columnWidth + 4 : endColumn * columnWidth) -
+        1,
     )
     const y1 = Math.round(dy + 2)
     const y2 = Math.round(dy + +rowHeight - 2)
@@ -1428,8 +1507,10 @@ async function createTextArea({
     },
 
     getHoverRect() {
-      const lineIndex = sourceIndex === null ? hover.mapping.generatedLine : hover.mapping.originalLine
-      const index = sourceIndex === null ? hover.mapping.generatedColumn : hover.mapping.originalColumn
+      const lineIndex =
+        sourceIndex === null ? hover.mapping.generatedLine : hover.mapping.originalLine
+      const index =
+        sourceIndex === null ? hover.mapping.generatedColumn : hover.mapping.originalColumn
       const column = analyzeLine(lineIndex, index, index, 'floor').indexToColumn(index)
       const { firstMapping, rangeOfMapping } = analyzeLine(lineIndex, column, column, 'floor')
       const range = rangeOfMapping(firstMapping)
@@ -1475,7 +1556,12 @@ async function createTextArea({
     onmousemove(e) {
       const { x, y, width, height } = bounds()
 
-      if (e.pageX >= x + margin && e.pageX < x + width - scrollbarThickness && e.pageY >= y && e.pageY < y + height) {
+      if (
+        e.pageX >= x + margin &&
+        e.pageX < x + width - scrollbarThickness &&
+        e.pageY >= y &&
+        e.pageY < y + height
+      ) {
         const { columnWidth, columnsAcross, wrappedRows } = computeScrollbarsAndClampScroll()
         let fractionalColumn = (e.pageX - x - margin - textPaddingX + scrollX) / columnWidth
         let roundedColumn = Math.round(fractionalColumn)
@@ -1486,7 +1572,8 @@ async function createTextArea({
           if (row >= 0) {
             // Adjust the mouse column due to line wrapping
             const lineIndex = lineIndexForRow(wrappedRows, row)
-            const firstColumn = lineIndex < wrappedRows.length ? (row - wrappedRows[lineIndex]) * columnsAcross : 0
+            const firstColumn =
+              lineIndex < wrappedRows.length ? (row - wrappedRows[lineIndex]) * columnsAcross : 0
             const lastColumn = firstColumn + columnsAcross
             fractionalColumn += firstColumn
             roundedColumn += firstColumn
@@ -1553,7 +1640,8 @@ async function createTextArea({
         const originalScrollX = scrollX
         mousemove = e => {
           scrollX = Math.round(
-            originalScrollX + ((e.pageX - x - px) * maxScrollX) / (scrollbarX.trackLength - scrollbarX.thumbLength),
+            originalScrollX +
+              ((e.pageX - x - px) * maxScrollX) / (scrollbarX.trackLength - scrollbarX.thumbLength),
           )
           computeScrollbarsAndClampScroll()
           isInvalid = true
@@ -1562,7 +1650,8 @@ async function createTextArea({
         const originalScrollY = scrollY
         mousemove = e => {
           scrollY = Math.round(
-            originalScrollY + ((e.pageY - y - py) * maxScrollY) / (scrollbarY.trackLength - scrollbarY.thumbLength),
+            originalScrollY +
+              ((e.pageY - y - py) * maxScrollY) / (scrollbarY.trackLength - scrollbarY.thumbLength),
           )
           computeScrollbarsAndClampScroll()
           isInvalid = true
@@ -1606,7 +1695,8 @@ async function createTextArea({
       const { firstMapping, rangeOfMapping } = analyzeLine(line, column, column, 'floor')
       const range = rangeOfMapping(firstMapping)
       const targetColumn = range
-        ? range.startColumn + Math.min((range.endColumn - range.startColumn) / 2, (width - margin) / 4 / columnWidth)
+        ? range.startColumn +
+          Math.min((range.endColumn - range.startColumn) / 2, (width - margin) / 4 / columnWidth)
         : column
       const endX = Math.max(0, Math.round(targetColumn * columnWidth - (width - margin) / 2))
       const row = wrappedRows[line] + Math.floor(column / columnsAcross)
@@ -1651,7 +1741,10 @@ async function createTextArea({
         if (firstRun < runCount) {
           // Scan to find the last run
           let lastRun = firstRun
-          while (lastRun + 1 < runCount && runStartColumn(runBase + 5 * (lastRun + 1)) < lastColumn) {
+          while (
+            lastRun + 1 < runCount &&
+            runStartColumn(runBase + 5 * (lastRun + 1)) < lastColumn
+          ) {
             lastRun++
           }
 
@@ -1695,14 +1788,22 @@ async function createTextArea({
               }
             }
             // Draw whitespace in a separate batch
-            ;(whitespace ? whitespaceBatch : textBatch).push(text, dx + startColumn * columnWidth, dyForText)
+            ;(whitespace ? whitespaceBatch : textBatch).push(
+              text,
+              dx + startColumn * columnWidth,
+              dyForText,
+            )
             currentColumn = endColumn
           }
         }
 
         // Draw the mappings
         for (let map = firstMapping; map < mappings.length; map += 6) {
-          if (mappings[map + mappingsOffset] !== lineIndex || mappings[map + mappingsOffset + 1] >= lastIndex) break
+          if (
+            mappings[map + mappingsOffset] !== lineIndex ||
+            mappings[map + mappingsOffset + 1] >= lastIndex
+          )
+            break
           if (mappings[map + 2] === -1) continue
 
           // Get the bounds of this mapping, which may be empty if it's ignored
@@ -1718,7 +1819,8 @@ async function createTextArea({
             const isGenerated = sourceIndex === null
             const hoverIsGenerated = hover.sourceIndex === null
             const matchesGenerated =
-              mappings[map] === hoveredMapping.generatedLine && mappings[map + 1] === hoveredMapping.generatedColumn
+              mappings[map] === hoveredMapping.generatedLine &&
+              mappings[map + 1] === hoveredMapping.generatedColumn
             const matchesOriginal =
               mappings[map + 2] === hoveredMapping.originalSource &&
               mappings[map + 3] === hoveredMapping.originalLine &&
@@ -1737,7 +1839,12 @@ async function createTextArea({
                   isGenerated
                   ? matchesGenerated
                   : matchesOriginal)
-            if (isGenerated && matchesGenerated && hoveredMapping.originalName !== -1 && !hoveredName) {
+            if (
+              isGenerated &&
+              matchesGenerated &&
+              hoveredMapping.originalName !== -1 &&
+              !hoveredName
+            ) {
               hoveredName = {
                 text: originalName(hoveredMapping.originalName),
                 x: Math.round(dx + range.startColumn * columnWidth - hoverBoxLineThickness),
@@ -1764,8 +1871,15 @@ async function createTextArea({
       const { x, y, width, height } = bounds()
       const textColor = bodyStyle.color
       const backgroundColor = bodyStyle.backgroundColor
-      const { columnWidth, columnsAcross, wrappedRows, maxScrollX, maxScrollY, scrollbarX, scrollbarY } =
-        computeScrollbarsAndClampScroll()
+      const {
+        columnWidth,
+        columnsAcross,
+        wrappedRows,
+        maxScrollX,
+        maxScrollY,
+        scrollbarX,
+        scrollbarY,
+      } = computeScrollbarsAndClampScroll()
 
       // Compute the visible column/row rectangle
       const firstColumn = Math.max(0, Math.floor((scrollX - textPaddingX) / columnWidth))
@@ -1882,7 +1996,9 @@ async function createTextArea({
       else if (hover && hover.sourceIndex === sourceIndex) {
         const column =
           hover.column -
-          (hover.lineIndex < wrappedRows.length ? columnsAcross * (hover.row - wrappedRows[hover.lineIndex]) : 0)
+          (hover.lineIndex < wrappedRows.length
+            ? columnsAcross * (hover.row - wrappedRows[hover.lineIndex])
+            : 0)
         const caretX = Math.round(x - scrollX + margin + textPaddingX + column * columnWidth)
         const caretY = Math.round(y - scrollY + textPaddingY + hover.row * rowHeight)
         c.fillStyle = textColor
@@ -1904,9 +2020,8 @@ async function createTextArea({
         }
       }
       // ;(sourceIndex === null ? generatedStatus : originalStatus).textContent = status
-      const tmpstatus = (sourceIndex === null ? generatedStatus : originalStatus)
+      const tmpstatus = sourceIndex === null ? generatedStatus : originalStatus
       if (tmpstatus) tmpstatus.textContent = status
-
 
       // Fade out wrapped mappings and hover boxes
       const wrapLeft = x + margin + textPaddingX
@@ -1955,7 +2070,10 @@ async function createTextArea({
         const h = rowHeight
         const r = 4
         // Clamp the tooltip in the viewport when wrapping is enabled
-        nameX = Math.max(wrapLeft - hoverBoxLineThickness, Math.min(wrapRight - w + hoverBoxLineThickness, nameX))
+        nameX = Math.max(
+          wrapLeft - hoverBoxLineThickness,
+          Math.min(wrapRight - w + hoverBoxLineThickness, nameX),
+        )
         c.beginPath()
         c.arc(nameX + r, nameY + r, r, -Math.PI, -Math.PI / 2, false)
         c.arc(nameX + w - r, nameY + r, r, -Math.PI / 2, 0, false)
@@ -1985,7 +2103,8 @@ async function createTextArea({
 
       // Draw the scrollbars
       if (scrollbarX) {
-        const dx = x + margin + (scrollX / maxScrollX) * (scrollbarX.trackLength - scrollbarX.thumbLength)
+        const dx =
+          x + margin + (scrollX / maxScrollX) * (scrollbarX.trackLength - scrollbarX.thumbLength)
         const dy = y + height - scrollbarThickness
         c.fillStyle = 'rgba(127, 127, 127, 0.5)'
         c.beginPath()
@@ -2012,7 +2131,14 @@ async function createTextArea({
         const dy = y + (scrollY / maxScrollY) * (scrollbarY.trackLength - scrollbarY.thumbLength)
         c.fillStyle = 'rgba(90, 20, 140, 0.4)'
         c.beginPath()
-        c.arc(dx + scrollbarThickness / 2, dy + scrollbarThickness / 2, scrollbarThickness / 4, -Math.PI, 0, false)
+        c.arc(
+          dx + scrollbarThickness / 2,
+          dy + scrollbarThickness / 2,
+          scrollbarThickness / 4,
+          -Math.PI,
+          0,
+          false,
+        )
         c.arc(
           dx + scrollbarThickness / 2,
           dy + scrollbarY.thumbLength - scrollbarThickness / 2,
@@ -2070,7 +2196,11 @@ function draw() {
   c.fillRect((innerWidth >>> 1) - (splitterWidth >> 1), 0, splitterWidth, innerHeight)
 
   // Draw the arrow between the two hover areas
-  if (hover?.mapping && originalTextArea && originalTextArea.sourceIndex === hover?.mapping.originalSource) {
+  if (
+    hover?.mapping &&
+    originalTextArea &&
+    originalTextArea.sourceIndex === hover?.mapping.originalSource
+  ) {
     const originalHoverRect = originalTextArea.getHoverRect()
     const generatedHoverRect = generatedTextArea.getHoverRect()
     if (originalHoverRect && generatedHoverRect) {
@@ -2081,7 +2211,8 @@ function draw() {
       const generatedArrowHead = hover.sourceIndex === originalTextArea.sourceIndex
       const [ox, oy, ow, oh] = originalHoverRect
       const [gx, gy, , gh] = generatedHoverRect
-      const x1 = Math.min(ox + ow, originalBounds.x + originalBounds.width) + (originalArrowHead ? 10 : 2)
+      const x1 =
+        Math.min(ox + ow, originalBounds.x + originalBounds.width) + (originalArrowHead ? 10 : 2)
       const x2 = Math.max(gx, generatedBounds.x + margin) - (generatedArrowHead ? 10 : 2)
       const y1 = oy + oh / 2
       const y2 = gy + gh / 2
@@ -2096,7 +2227,14 @@ function draw() {
       // Draw the curve
       c.beginPath()
       c.moveTo(x1, y1)
-      c.bezierCurveTo((x1 + 2 * x2) / 3 + margin / 2, y1, (x1 * 2 + x2) / 3 - margin / 2, y2, x2, y2)
+      c.bezierCurveTo(
+        (x1 + 2 * x2) / 3 + margin / 2,
+        y1,
+        (x1 * 2 + x2) / 3 - margin / 2,
+        y2,
+        x2,
+        y2,
+      )
       c.strokeStyle = textColor
       c.lineWidth = 2
       c.stroke()
@@ -2247,3 +2385,14 @@ const exampleMap = `{
   "names": ["h", "Fragment", "render", "h", "Component", "useState", "CounterClass", "props", "increment_", "value_", "decrement_", "initialValue_", "CounterFunction", "value", "setValue", "label_", "render", "h", "Fragment", "CounterClass", "label_", "initialValue_", "CounterFunction"]
 }
 `
+
+/*     ▄████▄  █    ██ ██▀███   ██████▓█████▓█████▄
+      ▒██▀ ▀█  ██  ▓██▓██ ▒ ██▒██    ▒▓█   ▀▒██▀ ██▌
+      ▒▓█    ▄▓██  ▒██▓██ ░▄█ ░ ▓██▄  ▒███  ░██   █▌
+      ▒▓▓▄ ▄██▓▓█  ░██▒██▀▀█▄   ▒   ██▒▓█  ▄░▓█▄   ▌
+      ▒ ▓███▀ ▒▒█████▓░██▓ ▒██▒██████▒░▒████░▒████▓
+      ░ ░▒ ▒  ░▒▓▒ ▒ ▒░ ▒▓ ░▒▓▒ ▒▓▒ ▒ ░░ ▒░ ░▒▒▓  ▒
+        ░  ▒  ░░▒░ ░ ░  ░▒ ░ ▒░ ░▒  ░ ░░ ░  ░░ ▒  ▒
+      ░        ░░░ ░ ░  ░░   ░░  ░  ░    ░   ░ ░  ░
+      ░ ░        ░       ░          ░    ░  ░  ░
+      ░                                      ░   */

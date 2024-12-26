@@ -25,23 +25,35 @@
           to get started. You can either drop a single JavaScript/<wbr /> CSS file with an inline
           source map comment, or a JavaScript/<wbr />
           CSS file and a separate source map file together.
-          <button id="uploadFiles">UPLOAD LOCAL</button>
+          <button id="uploadFiles">UPLOAD FILE</button>
         </blockquote>
 
         <hr />
 
         <h2>REMOTE</h2>
         <blockquote>
-          Or load remote URL
-          <button id="loadRemote">LOAD REMOTE</button>
-          <input type="text" id="remoteUrl" placeholder="https://example.com/example.js" />
+          <div style="display: flex; place-content: stretch; margin: 8px">
+            <pre>?url={SOURCEMAP}</pre>
+            <button id="loadRemote" style="width: 70%; margin: auto">LOAD URL</button>
+          </div>
+
+          <input
+            type="text"
+            id="remoteUrl"
+            placeholder="https://cdn.example.com/assets/bundle.js.map
+         "
+          />
         </blockquote>
+
         <hr />
 
         <h2>EXAMPLE</h2>
         <blockquote>
-          Or load an example to play around with the visualization.
-          <button id="loadExample">LOAD EXAMPLE</button>
+          Load an example to play around with the visualization
+          <span style="margin: auto">
+            <button id="loadExample">LOAD EXAMPLE FILE</button>
+            <button id="loadExampleURL">LOAD EXAMPLE URL</button>
+          </span>
         </blockquote>
 
         <div id="errorText"></div>

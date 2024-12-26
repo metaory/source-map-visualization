@@ -1,9 +1,24 @@
 # Source Map Visualization
 
+<div align="center">
+  <img src=".github/assets/sc-1.png" alt="logo" width="40%"> 
+  <img src=".github/assets/sc-2.png" alt="logo" width="40%">
+</div>
+
+---
+
+> [!CAUTION]
+> ☢️ THE CODEBASE IS CURSED 
+>
+> ⛔ AVOID EYE CONTACT WITH [code.js](https://github.com/metaory/source-map-visualization/blob/gh-pages/code.js)
+> 
+> CONTINUE AT YOUR OWN RISK 
+
+---
 
 ## FORK NOTES
 
-- added search params to load remote code
+- added `url` query string to load remote files
 - refactored the hellscape of code.js just a bit
 - removed old url hash implementation
 - removed statusbar and toolbar
